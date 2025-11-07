@@ -1,0 +1,9 @@
+{
+  "_comment": "OPTIONAL: Only needed for advanced customization",
+  "_comment2": "For Docker: Just use .env file. This file is not required.",
+  "_comment3": "For manual runs: Set USER_ID via environment variable OR add 'user_id' here",
+  "_comment4": "All settings below have sensible defaults and can be omitted",
+
+  "headless": false,
+  "wait_time": 15
+}

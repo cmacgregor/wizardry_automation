@@ -1,0 +1,53 @@
+version: '3.8'
+
+# Example docker-compose file for using pre-built image
+# Copy this to docker-compose.yml or merge with existing file
+
+services:
+  wizardry-bot:
+    # Use pre-built image instead of building
+    image: ghcr.io/YOUR_USERNAME/wizardry_automation:latest
+    container_name: wizardry-automation
+    restart: unless-stopped
+
+    # Security: Read-only root filesystem
+    read_only: true
+
+    # Security: Drop all capabilities
+    cap_drop:
+      - ALL
+
+    # Security: No new privileges
+    security_opt:
+      - no-new-privileges:true
+
+    # Mount config as read-only (only for non-sensitive settings)
+    volumes:
+      - ./config.json:/app/config.json:ro
+      - /tmp  # Writable tmp for Chrome
+      - /dev/shm  # Shared memory for Chrome
+
+    # Load environment variables from .env file
+    env_file:
+      - .env
+
+    # Environment variables (can override .env)
+    environment:
+      - TZ=${TZ:-America/New_York}
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
