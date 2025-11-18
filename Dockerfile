@@ -5,8 +5,8 @@ RUN groupadd -r botuser && useradd -r -g botuser botuser
 
 # Install Chrome and dependencies in a single layer to reduce image size
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    wget=1.21.* \
-    gnupg=2.2.* \
+    wget \
+    gnupg \
     ca-certificates \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg \
     && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
@@ -24,8 +24,8 @@ WORKDIR /app
 # Copy requirements first for better caching
 COPY requirements.txt .
 
-# Install Python dependencies with pinned versions
-RUN pip install --no-cache-dir --upgrade pip==24.* \
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt \
     && rm -rf /root/.cache
 
