@@ -25,7 +25,7 @@ jobs:
 
       - name: Build Docker image for scanning
         run: |
-          docker build -t wizardry-bot:scan .
+          docker build --platform linux/amd64 -t wizardry-bot:scan .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master

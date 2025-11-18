@@ -4,14 +4,20 @@ FROM python:3.11-slim
 RUN groupadd -r botuser && useradd -r -g botuser botuser
 
 # Install Chrome and dependencies in a single layer to reduce image size
+# Use TARGETARCH to support multi-platform builds
+ARG TARGETARCH
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     gnupg \
     ca-certificates \
-    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg \
-    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends google-chrome-stable \
+    && if [ "$TARGETARCH" = "amd64" ]; then \
+        wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg \
+        && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+        && apt-get update \
+        && apt-get install -y --no-install-recommends google-chrome-stable; \
+    elif [ "$TARGETARCH" = "arm64" ]; then \
+        apt-get install -y --no-install-recommends chromium chromium-driver; \
+    fi \
     # Clean up to reduce image size
     && apt-get purge -y --auto-remove wget gnupg \
     && apt-get clean \
@@ -33,8 +39,13 @@ RUN pip install --no-cache-dir --upgrade pip \
 COPY --chown=botuser:botuser wizardry_bot.py scheduler.py ./
 
 # Security: Run Chrome with no-sandbox for container environment
-ENV CHROME_BIN=/usr/bin/google-chrome-stable \
-    PYTHONUNBUFFERED=1 \
+# Create symlink for ARM64 to make chromium available as google-chrome for consistency
+ARG TARGETARCH
+RUN if [ "$TARGETARCH" = "arm64" ]; then \
+        ln -s /usr/bin/chromium /usr/bin/google-chrome-stable || true; \
+    fi
+
+ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
 # Security: Switch to non-root user
