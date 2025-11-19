@@ -19,11 +19,12 @@ services:
     security_opt:
       - no-new-privileges:true
 
-    # Mount config (optional - uses defaults if not present)
+    # Volumes required for Chrome to function with read-only root filesystem
     volumes:
-      - ./config.json:/app/config.json:ro
-      - /tmp  # Writable tmp for Chrome
-      - /dev/shm  # Shared memory for Chrome
+      - /tmp  # Required: Writable tmp for Chrome cache and temp files
+      - /dev/shm  # Required: Shared memory for Chrome (prevents crashes)
+      # Optional: Mount custom config if you need advanced settings
+      # - ./config.json:/app/config.json:ro
 
     # Load environment variables from .env file
     env_file:

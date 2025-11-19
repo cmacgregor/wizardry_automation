@@ -1,12 +1,18 @@
 version: '3.8'
 
-# Example docker-compose file for using pre-built image
-# Copy this to docker-compose.yml or merge with existing file
+# Example docker-compose file for using pre-built image from GitHub Container Registry
+#
+# Usage:
+#   1. Create a .env file with: USER_ID=your-user-id
+#   2. Run: docker-compose -f docker-compose.prebuilt.yml up -d
+#
+# Or copy this to docker-compose.yml and run: docker-compose up -d
 
 services:
   wizardry-bot:
-    # Use pre-built image instead of building
-    image: ghcr.io/YOUR_USERNAME/wizardry_automation:latest
+    # Use pre-built image from GitHub Container Registry
+    # Supports both amd64 and arm64 architectures
+    image: ghcr.io/cmacgregor/wizardry_automation:latest
     container_name: wizardry-automation
     restart: unless-stopped
 
@@ -21,11 +27,12 @@ services:
     security_opt:
       - no-new-privileges:true
 
-    # Mount config as read-only (only for non-sensitive settings)
+    # Volumes required for Chrome to function with read-only root filesystem
     volumes:
-      - ./config.json:/app/config.json:ro
-      - /tmp  # Writable tmp for Chrome
-      - /dev/shm  # Shared memory for Chrome
+      - /tmp  # Required: Writable tmp for Chrome cache and temp files
+      - /dev/shm  # Required: Shared memory for Chrome (prevents crashes)
+      # Optional: Mount custom config if you need advanced settings
+      # - ./config.json:/app/config.json:ro
 
     # Load environment variables from .env file
     env_file:
