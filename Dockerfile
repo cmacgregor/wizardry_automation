@@ -10,28 +10,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     gnupg \
     ca-certificates \
-    unzip \
     && if [ "$TARGETARCH" = "amd64" ]; then \
-        # Install Chrome
+        # Install Chrome and ChromeDriver
         wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg \
         && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
         && apt-get update \
-        && apt-get install -y --no-install-recommends google-chrome-stable \
-        # Install ChromeDriver to match Chrome version
-        && CHROME_VERSION=$(google-chrome --version | sed 's/Google Chrome //') \
-        && CHROMEDRIVER_VERSION=$(wget -qO- "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_${CHROME_VERSION%%.*}") \
-        && wget -q "https://storage.googleapis.com/chrome-for-testing-public/${CHROMEDRIVER_VERSION}/linux64/chromedriver-linux64.zip" \
-        && unzip chromedriver-linux64.zip \
-        && mv chromedriver-linux64/chromedriver /usr/local/bin/ \
-        && chmod +x /usr/local/bin/chromedriver \
-        && rm -rf chromedriver-linux64.zip chromedriver-linux64; \
+        && apt-get install -y --no-install-recommends google-chrome-stable chromium-driver \
+        && ln -s /usr/bin/chromedriver /usr/local/bin/chromedriver || true; \
     elif [ "$TARGETARCH" = "arm64" ]; then \
         # Chromium on ARM64 includes chromium-driver
         apt-get install -y --no-install-recommends chromium chromium-driver \
         && ln -s /usr/bin/chromedriver /usr/local/bin/chromedriver || true; \
     fi \
     # Clean up to reduce image size
-    && apt-get purge -y --auto-remove wget gnupg unzip \
+    && apt-get purge -y --auto-remove wget gnupg \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/* /var/tmp/*
