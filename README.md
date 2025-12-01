@@ -90,7 +90,8 @@ docker-compose down
 
 Create `.env` file:
 - **USER_ID**: Your Wizardry store User ID (required)
-- **TZ**: Your timezone (optional)
+- **TZ**: Your timezone (optional, defaults to America/New_York)
+- **RUN_ON_STARTUP**: Set to `true` to run bot immediately on container startup (optional, defaults to false)
 
 ### Manual Python Setup
 

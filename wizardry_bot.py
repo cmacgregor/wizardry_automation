@@ -2,6 +2,7 @@ import json
 import time
 import os
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -53,7 +54,15 @@ class WizardryBot:
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option('useAutomationExtension', False)
 
-        self.driver = webdriver.Chrome(options=options)
+        # Use pre-installed chromedriver if available (for Docker with read-only filesystem)
+        # Otherwise, Selenium will auto-download the driver
+        chromedriver_path = '/usr/local/bin/chromedriver'
+        if os.path.exists(chromedriver_path):
+            service = Service(executable_path=chromedriver_path)
+            self.driver = webdriver.Chrome(service=service, options=options)
+        else:
+            self.driver = webdriver.Chrome(options=options)
+
         self.driver.maximize_window()
 
     def navigate_to_site(self):

@@ -24,7 +24,10 @@ Your `.env` file should look like:
 ```env
 USER_ID=your-actual-user-id-here
 TZ=America/New_York
+RUN_ON_STARTUP=false
 ```
+
+**Optional**: Set `RUN_ON_STARTUP=true` to run the bot immediately when the container starts (useful for testing)
 
 ### 2. Pull and Run
 
@@ -78,6 +81,9 @@ Common issues:
 
 ### Need to change timezone
 Edit `.env` and change `TZ` to your timezone (e.g., `TZ=Europe/London`)
+
+### Want to test immediately
+Edit `.env` and set `RUN_ON_STARTUP=true`, then restart: `docker-compose -f docker-compose.prebuilt.yml restart`
 
 ### Want to customize schedule or settings
 See [README.md](README.md) for full configuration options.

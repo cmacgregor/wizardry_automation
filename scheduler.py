@@ -25,19 +25,26 @@ def run_bot():
 
 def main():
     """Main scheduler function."""
+    import os
+
     print("="*60)
     print("Wizardry Store Automation Bot - Scheduler Started")
     print("="*60)
     print("Schedule: Every Monday at 10:00 AM")
-    print("Waiting for scheduled time...")
-    print("="*60 + "\n")
+
+    # Check if bot should run immediately on startup
+    run_on_startup = os.getenv('RUN_ON_STARTUP', 'false').lower() in ('true', '1', 'yes')
+
+    if run_on_startup:
+        print("RUN_ON_STARTUP enabled - running bot immediately...")
+        print("="*60 + "\n")
+        run_bot()
+    else:
+        print("Waiting for scheduled time...")
+        print("="*60 + "\n")
 
     # Schedule the bot to run every Monday at 10:00 AM
     schedule.every().monday.at("10:00").do(run_bot)
-
-    # Optional: Run immediately on startup (comment out if you don't want this)
-    # print("Running bot immediately on startup...\n")
-    # run_bot()
 
     # Keep the scheduler running
     while True:
