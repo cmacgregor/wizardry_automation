@@ -45,6 +45,9 @@ chromedriver.log
 *~
 .DS_Store
 
+# Claude Code
+.claude/
+
 # OS
 Thumbs.db
 desktop.ini
