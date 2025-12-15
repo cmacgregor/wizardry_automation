@@ -64,9 +64,11 @@ class WizardryBot:
         # Otherwise, Selenium will auto-download the driver
         chromedriver_path = '/usr/local/bin/chromedriver'
         if os.path.exists(chromedriver_path):
+            print(f"Using pre-installed ChromeDriver at {chromedriver_path}")
             service = Service(executable_path=chromedriver_path)
             self.driver = webdriver.Chrome(service=service, options=options)
         else:
+            print("ChromeDriver not found at /usr/local/bin/chromedriver, using Selenium WebDriver Manager")
             self.driver = webdriver.Chrome(options=options)
 
         self.driver.maximize_window()
