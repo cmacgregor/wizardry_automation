@@ -1,5 +1,3 @@
-version: '3.8'
-
 # Example docker-compose file for using pre-built image from GitHub Container Registry
 #
 # Usage:
