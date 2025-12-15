@@ -29,11 +29,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxrandr2 \
     xdg-utils \
     && if [ "$TARGETARCH" = "amd64" ]; then \
-        # Install Chrome and ChromeDriver
-        wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg \
-        && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
-        && apt-get update \
-        && apt-get install -y --no-install-recommends google-chrome-stable chromium-driver \
+        # Install Chromium and ChromeDriver (compatible versions)
+        apt-get install -y --no-install-recommends chromium chromium-driver \
         && ln -s /usr/bin/chromedriver /usr/local/bin/chromedriver || true; \
     elif [ "$TARGETARCH" = "arm64" ]; then \
         # Chromium on ARM64 includes chromium-driver
@@ -61,11 +58,8 @@ RUN pip install --no-cache-dir --upgrade pip \
 COPY --chown=botuser:botuser wizardry_bot.py scheduler.py ./
 
 # Security: Run Chrome with no-sandbox for container environment
-# Create symlink for ARM64 to make chromium available as google-chrome for consistency
-ARG TARGETARCH
-RUN if [ "$TARGETARCH" = "arm64" ]; then \
-        ln -s /usr/bin/chromium /usr/bin/google-chrome-stable || true; \
-    fi
+# Create symlink to make chromium available as google-chrome-stable for Selenium compatibility
+RUN ln -s /usr/bin/chromium /usr/bin/google-chrome-stable || true
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
