@@ -43,6 +43,22 @@ class WizardryBot:
 
     def setup_driver(self):
         """Set up the Chrome WebDriver."""
+        import subprocess
+
+        # Diagnostic: Check Chrome/Chromium installation
+        try:
+            chrome_version = subprocess.run(['google-chrome-stable', '--version'],
+                                          capture_output=True, text=True, timeout=5)
+            print(f"Chrome version: {chrome_version.stdout.strip()}")
+        except Exception as e:
+            print(f"google-chrome-stable not found: {e}")
+            try:
+                chromium_version = subprocess.run(['chromium', '--version'],
+                                                capture_output=True, text=True, timeout=5)
+                print(f"Chromium version: {chromium_version.stdout.strip()}")
+            except Exception as e2:
+                print(f"chromium not found either: {e2}")
+
         options = webdriver.ChromeOptions()
 
         if self.config.get('headless', False):
