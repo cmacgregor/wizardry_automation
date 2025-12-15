@@ -32,7 +32,7 @@ services:
 
     # Environment variables (can override .env)
     environment:
-      - TZ=${TZ:-America/New_York}
+      - TZ=${TZ}
 
     # Resource limits
     deploy:
