@@ -6,6 +6,8 @@
 #
 # Or copy this to docker-compose.yml and run: docker-compose up -d
 
+version: '3.8'
+
 services:
   wizardry-bot:
     # Use pre-built image from GitHub Container Registry
