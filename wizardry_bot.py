@@ -80,7 +80,11 @@ class WizardryBot:
         chromedriver_path = '/usr/local/bin/chromedriver'
         if os.path.exists(chromedriver_path):
             print(f"Using pre-installed ChromeDriver at {chromedriver_path}")
-            service = Service(executable_path=chromedriver_path)
+            # Enable verbose logging for debugging
+            service = Service(
+                executable_path=chromedriver_path,
+                service_args=['--verbose', '--log-path=/tmp/chromedriver.log']
+            )
             self.driver = webdriver.Chrome(service=service, options=options)
         else:
             print("ChromeDriver not found at /usr/local/bin/chromedriver, using Selenium WebDriver Manager")
