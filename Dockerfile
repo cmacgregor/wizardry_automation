@@ -56,6 +56,10 @@ COPY --chown=botuser:botuser wizardry_bot.py scheduler.py ./
 # Create symlink to make chromium available as google-chrome-stable for Selenium compatibility
 RUN ln -s /usr/bin/chromium /usr/bin/google-chrome-stable || true
 
+# Remove chrome_crashpad_handler to prevent crash handler errors
+# This binary requires --database parameter which causes Chrome to fail in containers
+RUN rm -f /usr/lib/chromium/chrome_crashpad_handler || true
+
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     SE_AVOID_STATS=true
