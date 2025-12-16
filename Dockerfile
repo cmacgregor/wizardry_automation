@@ -28,15 +28,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxkbcommon0 \
     libxrandr2 \
     xdg-utils \
-    && if [ "$TARGETARCH" = "amd64" ]; then \
-        # Install Chromium and ChromeDriver (compatible versions)
-        apt-get install -y --no-install-recommends chromium chromium-driver \
-        && ln -s /usr/bin/chromedriver /usr/local/bin/chromedriver || true; \
-    elif [ "$TARGETARCH" = "arm64" ]; then \
-        # Chromium on ARM64 includes chromium-driver
-        apt-get install -y --no-install-recommends chromium chromium-driver \
-        && ln -s /usr/bin/chromedriver /usr/local/bin/chromedriver || true; \
-    fi \
+    # Install Chromium and ChromeDriver (always install, compatible on all architectures)
+    chromium \
+    chromium-driver \
+    && ln -s /usr/bin/chromedriver /usr/local/bin/chromedriver || true \
     # Clean up to reduce image size
     && apt-get purge -y --auto-remove wget gnupg \
     && apt-get clean \
