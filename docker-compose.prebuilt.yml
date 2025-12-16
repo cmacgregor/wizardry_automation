@@ -14,14 +14,9 @@ services:
     container_name: wizardry-automation
     restart: unless-stopped
 
-    # Security: Read-only root filesystem
-    read_only: true
-
-    # Security: Drop all capabilities except those needed by Chrome
+    # Security: Drop all capabilities (Chrome runs with --no-sandbox so doesn't need capabilities)
     cap_drop:
       - ALL
-    cap_add:
-      - SYS_ADMIN  # Required for Chrome sandboxing even with --no-sandbox
 
     # Security: No new privileges
     security_opt:
