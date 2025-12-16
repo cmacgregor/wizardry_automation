@@ -9,9 +9,11 @@ services:
     # Security: Read-only root filesystem
     read_only: true
 
-    # Security: Drop all capabilities
+    # Security: Drop all capabilities except those needed by Chrome
     cap_drop:
       - ALL
+    cap_add:
+      - SYS_ADMIN  # Required for Chrome sandboxing even with --no-sandbox
 
     # Security: No new privileges
     security_opt:
