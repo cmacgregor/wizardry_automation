@@ -64,12 +64,18 @@ class WizardryBot:
         if self.config.get('headless', False):
             options.add_argument('--headless=new')  # Use new headless mode
 
-        # Essential arguments for Docker/containerized environments
+        # Essential arguments for Docker/containerized environments with security restrictions
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument('--disable-gpu')
         options.add_argument('--disable-software-rasterizer')
         options.add_argument('--disable-extensions')
+
+        # Additional arguments for read-only filesystem and dropped capabilities
+        options.add_argument('--disable-setuid-sandbox')
+        options.add_argument('--disable-namespace-sandbox')
+        options.add_argument('--single-process')  # Run in single process mode (works with limited capabilities)
+        options.add_argument('--no-zygote')  # Don't use zygote process (incompatible with single-process)
 
         # Anti-detection options
         options.add_argument('--disable-blink-features=AutomationControlled')
