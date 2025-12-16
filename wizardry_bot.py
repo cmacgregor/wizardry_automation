@@ -45,6 +45,10 @@ class WizardryBot:
         """Set up the Chrome WebDriver."""
         import subprocess
 
+        # Set environment variable to prevent crash handler from launching
+        os.environ['CHROME_CRASHPAD_PIPE_NAME'] = ''
+        os.environ['BREAKPAD_DISABLE'] = '1'
+
         # Diagnostic: Check Chrome/Chromium installation
         try:
             chrome_version = subprocess.run(['google-chrome-stable', '--version'],
