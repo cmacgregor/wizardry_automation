@@ -25,6 +25,19 @@ services:
     environment:
       - TZ=${TZ}
 
+    # Security: Drop unnecessary capabilities
+    # Note: Chrome requires some capabilities even with --no-sandbox
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
+
+    # Security: No new privileges
+    security_opt:
+      - no-new-privileges:true
+
     # Resource limits
     deploy:
       resources:
