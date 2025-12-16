@@ -69,6 +69,7 @@ class WizardryBot:
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument('--disable-gpu')
         options.add_argument('--disable-setuid-sandbox')
+        options.add_argument('--disable-crash-reporter')  # Disable crash handler that requires --database
 
         # Anti-detection options
         options.add_argument('--disable-blink-features=AutomationControlled')
