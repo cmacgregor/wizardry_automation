@@ -14,20 +14,8 @@ services:
     container_name: wizardry-automation
     restart: unless-stopped
 
-    # Security: Drop all capabilities (Chrome runs with --no-sandbox so doesn't need capabilities)
-    cap_drop:
-      - ALL
-
-    # Security: No new privileges
-    security_opt:
-      - no-new-privileges:true
-
-    # Volumes required for Chrome to function with read-only root filesystem
-    volumes:
-      - /tmp  # Required: Writable tmp for Chrome cache and temp files
-      - /dev/shm  # Required: Shared memory for Chrome (prevents crashes)
-      # Optional: Mount custom config if you need advanced settings
-      # - ./config.json:/app/config.json:ro
+    # Shared memory size for Chrome (prevents crashes)
+    shm_size: '2gb'
 
     # Load environment variables from .env file
     env_file:
