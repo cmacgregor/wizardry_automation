@@ -56,16 +56,16 @@ COPY --chown=botuser:botuser wizardry_bot.py scheduler.py ./
 # Create symlink to make chromium available as google-chrome-stable for Selenium compatibility
 RUN ln -s /usr/bin/chromium /usr/bin/google-chrome-stable || true
 
-# Replace chrome_crashpad_handler with a no-op script
-# The crash handler requires --database parameter which causes Chrome to fail in containers
-# Chrome expects this binary to exist, so we replace it with a dummy that does nothing
-RUN rm -f /usr/lib/chromium/chrome_crashpad_handler && \
-    echo '#!/bin/sh\nexit 0' > /usr/lib/chromium/chrome_crashpad_handler && \
-    chmod +x /usr/lib/chromium/chrome_crashpad_handler
+# Fix chrome_crashpad_handler --database error (Chrome 128+ issue)
+# Set XDG directories to writable locations for crash handler
+# See: https://github.com/puppeteer/puppeteer/issues/11023
+RUN mkdir -p /tmp/.chromium && chmod 777 /tmp/.chromium
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    SE_AVOID_STATS=true
+    SE_AVOID_STATS=true \
+    XDG_CONFIG_HOME=/tmp/.chromium \
+    XDG_CACHE_HOME=/tmp/.chromium
 
 # Security: Switch to non-root user
 USER botuser
