@@ -1,0 +1,32 @@
+name: Claim Free Items
+
+on:
+  schedule:
+    # Daily at 16:17 UTC. Free items reset Sundays at 10:00 AM US Eastern
+    # (14:00/15:00 UTC), so Sunday's run claims them and the other days retry
+    # if it failed. Already-claimed items are skipped.
+    - cron: '17 16 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Only list what would be claimed'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  claim:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Claim free items
+        env:
+          USER_ID: ${{ secrets.USER_ID }}
+          COUNTRY: ${{ vars.COUNTRY || 'US' }}
+          DRY_RUN: ${{ inputs.dry_run || 'false' }}
+        run: python3 claim_free_items.py
