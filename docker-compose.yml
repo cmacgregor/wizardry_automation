@@ -6,6 +6,9 @@ services:
     container_name: wizardry-automation
     restart: unless-stopped
 
+    # Reap orphaned Chrome/ChromeDriver processes (scheduler.py runs as PID 1)
+    init: true
+
     # Shared memory size for Chrome (prevents crashes)
     shm_size: '2gb'
 
