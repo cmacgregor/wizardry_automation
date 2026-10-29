@@ -1,130 +1,54 @@
-# Wizardry Store Automation Bot
+# Wizardry Store Automation
 
-Automatically collect your weekly free gems from the Wizardry Variants Daphne store.
+Automatically collect your weekly free gems from the [Wizardry Variants Daphne store](https://store.wizardry.info/).
 
-This bot logs into https://store.wizardry.info/ with your User ID and clicks the "Get Free" button in the Free Items section. Run it manually or set it up with Docker to collect your free gems automatically every week.
+`claim_free_items.py` talks to the store's Xsolla API directly: it logs in with your User ID, lists the store items and claims every free item that still has a claim left. No browser is needed, and it only uses the Python standard library.
 
-## Quick Start with Docker (Recommended)
+Free items reset every Sunday at 10:00 AM US Eastern.
 
-**Automatically collect free gems every week with a secure, lightweight container:**
+## Run with Docker
 
-### Option 1: Use Pre-built Image (Easiest)
-
-1. Create `.env` file with your User ID:
+1. Create a `.env` file with your User ID:
    ```bash
    cp .env.example .env
-   # Edit .env: USER_ID=your-actual-user-id
+   # Edit .env: USER_ID=your-user-id
    ```
 
-2. Pull and run:
+2. Start the container, using the pre-built image or building it locally:
    ```bash
-   docker pull ghcr.io/YOUR_USERNAME/wizardry_automation:latest
-   docker-compose up -d
+   docker compose pull && docker compose up -d   # pre-built image
+   docker compose up -d --build                  # build locally
    ```
 
-### Option 2: Build Locally
+The container checks for free items every `CHECK_INTERVAL_HOURS` (6 by default) and skips items that are already claimed.
 
-1. Create `.env` file (same as above)
-2. Build and start:
-   ```bash
-   docker-compose up -d --build
-   ```
+View logs with `docker compose logs -f` and stop it with `docker compose down`.
 
-**That's it!** Your User ID stays in the local `.env` file (never committed to git, never in the Docker image).
+## Run without Docker
 
-Done! The bot will now run automatically every Monday at 10:00 AM.
-
-**View logs:**
-```bash
-docker-compose logs -f
-```
-
-**Stop the bot:**
-```bash
-docker-compose down
-```
-
-**Resources:**
-- [DOCKER.md](DOCKER.md) - Detailed Docker instructions and scheduling
-- [SECURITY.md](SECURITY.md) - Security features and best practices
-- [.github/workflows/README.md](.github/workflows/README.md) - CI/CD documentation
-
----
-
-## Browserless Claim Script (Experimental)
-
-`claim_free_items.py` claims the weekly free items through the Xsolla store API directly, with no browser or chromedriver. It only needs Python 3 (no extra packages).
+Requires Python 3.8 or newer.
 
 ```bash
-# List what would be claimed without claiming anything
-USER_ID=your-user-id DRY_RUN=true python claim_free_items.py
+# Linux/Mac
+USER_ID=your-user-id DRY_RUN=true python claim_free_items.py   # list only
+USER_ID=your-user-id python claim_free_items.py                # claim
 
-# Claim for real
-USER_ID=your-user-id python claim_free_items.py
+# Windows PowerShell
+$env:USER_ID="your-user-id"; python claim_free_items.py
 ```
 
-The free items reset every Sunday at 10:00 AM US Eastern. Once this has claimed successfully, it can replace the Selenium bot.
+## Settings
 
-## Manual Installation (Without Docker)
+All settings are environment variables (or entries in `.env` for Docker):
 
-### Prerequisites
+| Variable | Default | Description |
+|---|---|---|
+| `USER_ID` | (required) | Your Wizardry store User ID |
+| `COUNTRY` | `US` | Country code sent at login |
+| `CHECK_INTERVAL_HOURS` | (empty) | Check again every N hours; empty runs once and exits |
+| `DRY_RUN` | `false` | `true` lists what would be claimed without claiming |
 
-- Python 3.7 or higher
-- Google Chrome browser
+## CI
 
-### Setup
-
-1. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Set your User ID (choose one):**
-
-   **Option A: Environment variable (recommended)**
-   ```bash
-   export USER_ID=your-user-id  # Linux/Mac
-   $env:USER_ID="your-user-id"  # Windows PowerShell
-   ```
-
-   **Option B: Config file**
-   ```bash
-   cp config.json.example config.json
-   # Edit config.json and add your User ID
-   ```
-
-3. **Run the bot:**
-   ```bash
-   python wizardry_bot.py
-   ```
-
-## Configuration
-
-### Docker Setup
-
-Create `.env` file:
-- **USER_ID**: Your Wizardry store User ID (required)
-- **TZ**: Your timezone (optional, defaults to America/New_York)
-- **RUN_ON_STARTUP**: Set to `true` to run bot immediately on container startup (optional, defaults to false)
-
-### Manual Python Setup
-
-**Required:** Set User ID via environment variable OR config.json
-
-**Optional Customization** (create `config.json` from template):
-- **headless**: `false` to watch browser, `true` for background (default: false)
-- **wait_time**: Timeout in seconds for slow connections (default: 15)
-
-## How It Works
-
-1. Opens the Wizardry store website
-2. Dismisses cookie consent popup
-3. Logs in with your User ID (no password needed)
-4. Scrolls to the Free Items section
-5. Clicks the "Get Free" button
-
-## Notes
-
-- Free gems can only be collected once per week
-- The website uses User ID authentication only (no password required)
-- For debugging, set `headless: false` in config.json to watch the browser
+- `.github/workflows/docker-build.yml` builds the image for amd64 and arm64 and pushes it to `ghcr.io` on pushes to `master` and version tags.
+- `.github/workflows/security-scan.yml` scans the image with Trivy weekly and on every push.

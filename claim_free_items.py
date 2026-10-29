@@ -3,10 +3,15 @@
 Logs in with the user ID, lists the store items and claims every free item that
 still has a claim available. Set DRY_RUN=true to list what would be claimed
 without claiming anything.
+
+Runs once by default. Set CHECK_INTERVAL_HOURS to keep running and check again
+every N hours; already-claimed items are skipped, so frequent checks are safe.
 """
 import json
 import os
 import sys
+import time
+from datetime import datetime
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -92,13 +97,8 @@ def claim(token, sku):
     return request_json(f'{STORE_API}/free/item/{sku_path}', method='POST', body={}, token=token)
 
 
-def main():
-    user_id = os.getenv('USER_ID')
-    if not user_id or user_id == 'YOUR_USER_ID_HERE':
-        sys.exit('USER_ID environment variable must be set')
-    country = os.getenv('COUNTRY', 'US')
-    dry_run = os.getenv('DRY_RUN', 'false').lower() in ('true', '1', 'yes')
-
+def claim_all(user_id, country, dry_run):
+    """Log in and claim every free item that is still available."""
     print('Logging in...')
     token = login(user_id, country)
 
@@ -123,8 +123,34 @@ def main():
     print(f'Done. Claimed {claimed} item(s).')
 
 
+def main():
+    user_id = os.getenv('USER_ID')
+    if not user_id or user_id == 'YOUR_USER_ID_HERE':
+        sys.exit('USER_ID environment variable must be set')
+    country = os.getenv('COUNTRY', 'US')
+    dry_run = os.getenv('DRY_RUN', 'false').lower() in ('true', '1', 'yes')
+    interval_hours = float(os.getenv('CHECK_INTERVAL_HOURS') or 0)
+
+    if not interval_hours:
+        try:
+            claim_all(user_id, country, dry_run)
+        except Exception as e:
+            sys.exit(f'Claim failed: {e}')
+        return
+
+    print(f'Checking for free items every {interval_hours:g} hour(s)')
+    while True:
+        print(f"\n[{datetime.now():%Y-%m-%d %H:%M:%S}] Checking for free items...")
+        try:
+            claim_all(user_id, country, dry_run)
+        except Exception as e:
+            # Keep running; the next check retries
+            print(f'Claim failed: {e}')
+        time.sleep(interval_hours * 3600)
+
+
 if __name__ == '__main__':
     try:
         main()
-    except Exception as e:
-        sys.exit(f'Claim failed: {e}')
+    except KeyboardInterrupt:
+        pass
