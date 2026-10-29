@@ -1,5 +1,0 @@
-# Pinned: selenium 4.40+ changed the chromedriver startup check, which fails in
-# the container with "Can not connect to the Service /usr/local/bin/chromedriver".
-# 4.39.0 is the version the working Docker image was built with.
-selenium==4.39.0
-schedule>=1.2.0,<2
