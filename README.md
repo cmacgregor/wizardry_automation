@@ -51,6 +51,20 @@ docker-compose down
 
 ---
 
+## Browserless Claim Script (Experimental)
+
+`claim_free_items.py` claims the weekly free items through the Xsolla store API directly, with no browser or chromedriver. It only needs Python 3 (no extra packages).
+
+```bash
+# List what would be claimed without claiming anything
+USER_ID=your-user-id DRY_RUN=true python claim_free_items.py
+
+# Claim for real
+USER_ID=your-user-id python claim_free_items.py
+```
+
+The free items reset every Sunday at 10:00 AM US Eastern. Once this has claimed successfully, it can replace the Selenium bot.
+
 ## Manual Installation (Without Docker)
 
 ### Prerequisites
