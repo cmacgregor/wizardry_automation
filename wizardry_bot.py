@@ -94,7 +94,17 @@ class WizardryBot:
                 executable_path=chromedriver_path,
                 service_args=['--verbose', '--log-path=/tmp/chromedriver.log']
             )
-            self.driver = webdriver.Chrome(service=service, options=options)
+            try:
+                self.driver = webdriver.Chrome(service=service, options=options)
+            except Exception:
+                # Show the tail of the ChromeDriver log so startup failures are diagnosable
+                try:
+                    with open('/tmp/chromedriver.log', errors='replace') as log_file:
+                        print("--- Last lines of /tmp/chromedriver.log ---")
+                        print(''.join(log_file.readlines()[-40:]))
+                except OSError as log_error:
+                    print(f"Could not read /tmp/chromedriver.log: {log_error}")
+                raise
         else:
             print("ChromeDriver not found at /usr/local/bin/chromedriver, using Selenium WebDriver Manager")
             self.driver = webdriver.Chrome(options=options)
